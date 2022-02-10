@@ -38,29 +38,18 @@ use Symfony\Component\Console\SingleCommandApplication;
 
         // Saved denied domains/pages in a map to use for later
         $output->writeln("<info>Generating map for denied pages</info>");
-        $deniedDomains = [];
+        $deniedPages = [];
         $deniedDomainsStream = gzopen(DenylistDownloader::FILENAME, 'rb');
         while ($row = fgets($deniedDomainsStream)) {
             [$domain, $page] = $row;
-            $deniedDomains[$domain][$page] = true;
+            $deniedPages[$domain][$page] = true;
         }
         gzclose($deniedDomainsStream);
 
         // Generate results for query range
-        $start = Carbon::parse($date)->setHour($hour);
-        $end = Carbon::parse($endDate)->setHour($endHour);
+        (new TopPagesGenerator((new PageViewDownloader()), $deniedPages, TopPagesGenerator::TOP_COUNT, function($message) use($output) {
+            $output->writeln($message);
+        }))->generate($date, $hour, $endDate, $endHour);
 
-        while ($start->lessThanOrEqualTo($end)) {
-            $queryDate = $start->toDateString();
-            $queryHour = $start->hour;
-
-            // generate result file for top pages based on provided date and hour
-            $output->writeln("<info>Generating result for top 25 pages per domain for date $queryDate and hour $queryHour</info>");
-            $topPagesGenerator = new TopPagesGenerator((new PageViewDownloader()), $deniedDomains);
-            $resultFilename = $topPagesGenerator->generate($queryDate, $queryHour);
-            $output->writeln("<info>Result file is $resultFilename</info>");
-
-            $start->addHour();
-        }
     })
     ->run();
