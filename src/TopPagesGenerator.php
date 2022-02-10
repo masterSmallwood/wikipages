@@ -1,16 +1,24 @@
 <?php
 
-require 'src/PageViewDownloader.php';
-require 'src/PageViewsHeap.php';
+namespace App;
+
+use App\Contracts\DownloadsFiles;
 
 class TopPagesGenerator
 {
     protected const TOP_COUNT = 25;
 
-    public function __construct($deniedDomains = [])
+    protected array $denied;
+
+    protected DownloadsFiles $downloader;
+
+    protected int $topCount;
+
+    public function __construct(DownloadsFiles $downloader, $deniedDomains = [], $topCount = self::TOP_COUNT)
     {
         $this->denied = $deniedDomains;
-        $this->downloader = new PageViewDownloader();
+        $this->downloader = $downloader;
+        $this->topCount = $topCount;
     }
 
     public function generate($date, $hour)
@@ -37,12 +45,12 @@ class TopPagesGenerator
 
             if (isset($domains[$domain])) {
                 $heap = $domains[$domain];
-                if ($heap->count() < self::TOP_COUNT) {
+                if ($heap->count() < $this->topCount) {
                     $heap->insert([$page, $views]);
                 }
 
                 else {
-                    // heap is full. Only insert page if it has more views than top of min heap (in the top 25)
+                    // heap is full. Only insert page if it has more views than top of min heap (in the top K)
                     if ($views > $heap->top()[1]) {
                         $heap->extract();
                         $heap->insert([$page, $views]);
@@ -60,14 +68,18 @@ class TopPagesGenerator
 
         $resultFileStream = fopen("results/$resultFilename", 'w');
         foreach($domains as $domain => $heap) {
+            $results = [];
             while ($heap->count() > 0) {
-                [$page, $views] = $heap->extract();
-                fwrite($resultFileStream, "$domain $page $views");
+                $results[] = $heap->extract();
+            }
+            foreach(array_reverse($results) as $result) {
+                [$page, $views] = $result;
+                fwrite($resultFileStream, "$domain $page $views\n");
             }
         }
         fclose($resultFileStream);
 
-        echo "Result generated successfully\n";
+        echo "Result $resultFilename generated successfully\n";
     }
 
     /**

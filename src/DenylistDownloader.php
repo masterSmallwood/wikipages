@@ -1,5 +1,7 @@
 <?php
 
+namespace App;
+
 class DenylistDownloader
 {
     public const FILENAME = 'denylist';

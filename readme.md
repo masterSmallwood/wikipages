@@ -6,7 +6,7 @@ Build the image:
 
 Run the container:
 
-`docker run -t -d --name wikipages top-wiki-pages `
+`docker run -t -d --rm --name wikipages top-wiki-pages `
 
 Exec into the container:
 

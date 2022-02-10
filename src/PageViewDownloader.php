@@ -1,6 +1,10 @@
 <?php
 
-class PageViewDownloader
+namespace App;
+
+use App\Contracts\DownloadsFiles;
+
+class PageViewDownloader implements DownloadsFiles
 {
     protected const URL_BASE = 'https://dumps.wikimedia.org/other/pageviews/';
 
@@ -9,10 +13,9 @@ class PageViewDownloader
      *
      * @param string $date Formatted year-month-day
      * @param string $hour 24-hour format. Enter value 0-23
-     * @param bool $forceDownload
      * @return string Return the filename
      */
-    public function download(string $date, string $hour, $forceDownload = false)
+    public function download($date, $hour)
     {
         $parsedDate = date_parse($date);
 
@@ -22,7 +25,8 @@ class PageViewDownloader
 
         $url = self::URL_BASE . "$year/$year-$month/pageviews-$year$month$day-$hour" . '0000.gz';
         $filename = "$year-$month-$day-$hour";
-        if (!file_exists($filename) || $forceDownload) {
+        if (!file_exists($filename)) {
+            echo "Downloading views from $date at hour $hour\n";
             file_put_contents($filename, file_get_contents($url));
         }
 
