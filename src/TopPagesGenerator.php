@@ -14,14 +14,19 @@ class TopPagesGenerator
 
     protected int $topCount;
 
-    public function __construct(DownloadsFiles $downloader, $deniedDomains = [], $topCount = self::TOP_COUNT)
+    public function __construct(DownloadsFiles $downloader, $deniedPages = [], $topCount = self::TOP_COUNT)
     {
-        $this->denied = $deniedDomains;
+        $this->denied = $deniedPages;
         $this->downloader = $downloader;
         $this->topCount = $topCount;
     }
 
-    public function generate($date, $hour)
+    /**
+     * @param $date
+     * @param $hour
+     * @return string
+     */
+    public function generate($date, $hour) : string
     {
         $resultFilename = $this->generateResultFilename($date, $hour);
 
@@ -31,7 +36,7 @@ class TopPagesGenerator
             return $resultFilename;
         }
 
-        // TODO will need to force download for current hour maybe
+        // TODO will need to force download for current hour maybe?
         $pageViewsFilename = $this->downloader->download($date, $hour);
 
         // Build top sites for a single file. Store items in the heap in format [page, view_count].
@@ -79,7 +84,9 @@ class TopPagesGenerator
         }
         fclose($resultFileStream);
 
-        echo "Result $resultFilename generated successfully\n";
+//        echo "Result $resultFilename generated successfully\n";
+
+        return $resultFilename;
     }
 
     /**
