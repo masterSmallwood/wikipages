@@ -12,6 +12,12 @@ Exec into the container:
 
 `docker exec -ti wikipages bash`
 
+### Tests
+
+Within the container in the working directory, run:
+
+`./vendor/bin/phpunit --testsuite project`
+
 ### Usage:
 
 If you don't provide any arguments, it will query the current date and hour. The wikipedia data for the current hour may not be available yet.
