@@ -29,11 +29,16 @@ class PageViewDownloader implements DownloadsFiles
         $filename = "$year-$month-$day-$hour";
         if (!file_exists($filename)) {
             echo "Downloading views from $date at hour $hour\n";
-            $content = file_get_contents($url);
-            if ($content === false) {
+            $filePointer = fopen($url, 'r');
+            if ($filePointer) {
+                $resultFilePointer = fopen($filename, 'w');
+                while (!feof($filePointer)) {
+                    $line = fgets($filePointer);
+                    fwrite($resultFilePointer, $line);
+                }
+            } else {
                 throw new DownloadFailedException();
             }
-            file_put_contents($filename, $content);
         }
 
         return $filename;
