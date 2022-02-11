@@ -37,6 +37,8 @@ For deploying this to a production setting, the improvements I would make are:
 - Considering this particular problem, we could precompute results for each hour and store the files in an object storage for clients to download.
 - Add a CI/CD pipeline.
 
+![design](design.png)
+
 #### Testing
 The test suite for something of this scope is fairly simple. Currently, the core thing
 we need to test is if we can take a page view file and transform that into another file.
