@@ -44,7 +44,7 @@ The test suite for something of this scope is fairly simple. Currently, the core
 we need to test is if we can take a page view file and transform that into another file.
 I would continue to expand on the test suite here currently, as its fairly basic.
 One benefit of loading all our page view data into a database is testing would be
-improved. We could rely on database queries instead of parsing files (and writing 
+improved and much easier. We could rely on database queries instead of parsing files (and writing 
 tests for those transformations) every time we need to create an
 aggregate of our data.
 
