@@ -71,7 +71,7 @@ class TopPagesGenerator
             try {
                 $pageViewsFilename = $this->downloader->download($queryDate, $queryHour);
             } catch (Throwable) {
-                throw new DownloadFailedException("An error occured when trying to download the page view results for $queryDate at $queryHour");
+                throw new DownloadFailedException("An error occured when trying to download the page view results for $queryDate at $queryHour. If you are looking for the current hours data, it may not be available yet.");
             }
 
             // generate result file for top pages based on provided date and hour

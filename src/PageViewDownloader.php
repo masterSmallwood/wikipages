@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Contracts\DownloadsFiles;
+use App\Exceptions\DownloadFailedException;
 
 class PageViewDownloader implements DownloadsFiles
 {
@@ -28,7 +29,11 @@ class PageViewDownloader implements DownloadsFiles
         $filename = "$year-$month-$day-$hour";
         if (!file_exists($filename)) {
             echo "Downloading views from $date at hour $hour\n";
-            file_put_contents($filename, file_get_contents($url));
+            $content = file_get_contents($url);
+            if ($content === false) {
+                throw new DownloadFailedException();
+            }
+            file_put_contents($filename, $content);
         }
 
         return $filename;

@@ -19,7 +19,7 @@ use Symfony\Component\Console\SingleCommandApplication;
     ->addArgument('date', InputArgument::OPTIONAL, 'The start/query date (year-month-day). Current UTC date if omitted.')
     ->addArgument('hour', InputArgument::OPTIONAL, 'The start/query UTC hour (0-23). Current UTC hour if omitted.')
     ->addOption('end-date', null, InputOption::VALUE_OPTIONAL, 'Date to end the query')
-    ->addOption('end-hour', null, InputOption::VALUE_OPTIONAL, 'Hour to end the query')
+    ->addOption('end-hour', null, InputOption::VALUE_OPTIONAL, 'Hour (UTC) to end the query')
     ->setCode(function (InputInterface $input, OutputInterface $output) {
 
         $date = $input->getArgument('date') ?? Carbon::now()->toDateString();

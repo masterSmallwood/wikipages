@@ -20,6 +20,10 @@ Within the container in the working directory, run:
 
 ### Usage:
 
+To see the input options and their descriptions:
+
+`php main.php --help`
+
 If you don't provide any arguments, it will query the current date and hour. Keep in mind the wikipedia data for the current hour may not be available yet.
 
 `php main.php`
@@ -33,6 +37,8 @@ You can query for a range of results:
 `php main.php 2022-02-01 12 --end-date=2022-02-02 --end-hour=12` 
 
 Keep in mind, that for any results you have not previously generated, the data for each hour will need to be downloaded before results can be generated. So providing a large range could potentially take a very long time depending on your internet speed.
+
+All result files are stored in the `/results` folder.
 
 ### Discussion:
 #### Explanation
