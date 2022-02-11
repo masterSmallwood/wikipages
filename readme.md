@@ -20,7 +20,7 @@ Within the container in the working directory, run:
 
 ### Usage:
 
-If you don't provide any arguments, it will query the current date and hour. The wikipedia data for the current hour may not be available yet.
+If you don't provide any arguments, it will query the current date and hour. Keep in mind the wikipedia data for the current hour may not be available yet.
 
 `php main.php`
 
@@ -35,6 +35,32 @@ You can query for a range of results:
 Keep in mind, that for any results you have not previously generated, the data for each hour will need to be downloaded before results can be generated. So providing a large range could potentially take a very long time depending on your internet speed.
 
 ### Discussion:
+#### Explanation
+In order to create a results file the following things are done:
+1. Download the pages views file from wikipedia dumps.
+2. I used a map data structure where the key is the unique domain code and the value is a min heap that can have a max size of 25.
+3. Since the domain codes from the page views file are already sorted, we can iterate through it line by line and attempt to add it to the data structure described above.
+4. Once finished, we iterate the data structure and for each key (domain) we extract all elements from its heap and write these to the results file.
+
+#### Tradeoffs
+I chose to use PHP because it's what I use regularly. I probably could have gotten better performance if I went with a compiled language
+like C/C++. 
+
+The main tradeoff I had to give thought to was whether to use a database or not. Using a database would have provided a more
+robust solution because we'd have the flexibility to query for whatever we wanted (not solely the top 25 pages per domain). 
+Given the 3-6 hour timeframe I opted to make a simpler solution of higher quality.
+
+#### Time and Space Complexity
+- n = lines in the page views file
+- d = unique domains
+- 25 = the max size of the heaps
+- e = lines in the denied pages file
+
+Once we've downloaded the page views file, the main operations we need to do are:
+- Read the denied pages into a map for fast lookup. Time: O(e) Space: O(e)
+- Read the page views file into the map/heap data structure. Time: O(n) + O(log(25 * d)) Space: O(log(25 * d))
+- Write the results to a results file. Time: O(log(25 * d)) Space: O(25*d)
+
 #### Production Setting Improvements and Additions
 For deploying this to a production setting, the improvements I would make are:
 - Load the page view data from Wikipedia into a database for further querying later on.
