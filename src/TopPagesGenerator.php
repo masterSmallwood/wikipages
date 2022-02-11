@@ -53,9 +53,6 @@ class TopPagesGenerator
             $queryDate = $start->toDateString();
             $queryHour = $start->hour;
 
-            // generate result file for top pages based on provided date and hour
-            ($this->output)("<info>Generating result for top 25 pages per domain for date $queryDate and hour $queryHour</info>");
-
             $resultFilename = $this->generateResultFilename($queryDate, $queryHour);
 
             // Skip this query if we've already generated the results
@@ -69,6 +66,9 @@ class TopPagesGenerator
 
             // TODO will need to force download for current hour maybe?
             $pageViewsFilename = $this->downloader->download($queryDate, $queryHour);
+
+            // generate result file for top pages based on provided date and hour
+            ($this->output)("<info>Generating result for top 25 pages per domain for date $queryDate and hour $queryHour</info>");
 
             // Build top sites for a single file. Store items in the heap in format [page, view_count].
             $stream = gzopen($pageViewsFilename, 'rb');
