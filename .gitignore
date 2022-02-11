@@ -2,3 +2,4 @@
 /vendor
 denylist
 /results
+.phpunit.result.cache
