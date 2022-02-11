@@ -44,13 +44,13 @@ The test suite for something of this scope is fairly simple. Currently, the core
 we need to test is if we can take a page view file and transform that into another file.
 I would continue to expand on the test suite here currently, as its fairly basic.
 One benefit of loading all our page view data into a database is testing would be
-improved. We could rely on a database queries instead of manually parsing
-files (and writing tests for those transformations) every time we need to create an
+improved. We could rely on database queries instead of parsing files (and writing 
+tests for those transformations) every time we need to create an
 aggregate of our data.
 
 #### Changes if Needed to Run Every Hour
 If we needed to generate the result set every hour, the most straightforward solution
-would put this command on a CRON job that runs every hour. The current amount of data
+would put this command on a cron job that runs every hour. The current amount of data
 this processes per hour is pretty small, so this solution would suffice. If we needed 
 this to scale to far greater data volumes, I think the biggest bottleneck would be
 network bandwidth. Wikipedia makes the data for the hour available all at once, so we will
