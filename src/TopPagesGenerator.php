@@ -2,8 +2,10 @@
 
 namespace App;
 
+use Throwable;
 use Carbon\Carbon;
 use App\Contracts\DownloadsFiles;
+use App\Exceptions\DownloadFailedException;
 
 class TopPagesGenerator
 {
@@ -39,7 +41,9 @@ class TopPagesGenerator
      * @param $hour
      * @param $endDate
      * @param $endHour
+     *
      * @return array
+     * @throws DownloadFailedException
      */
     public function generate($date, $hour, $endDate, $endHour) : array
     {
@@ -64,8 +68,11 @@ class TopPagesGenerator
                 continue;
             }
 
-            // TODO will need to force download for current hour maybe?
-            $pageViewsFilename = $this->downloader->download($queryDate, $queryHour);
+            try {
+                $pageViewsFilename = $this->downloader->download($queryDate, $queryHour);
+            } catch (Throwable) {
+                throw new DownloadFailedException("An error occured when trying to download the page view results for $queryDate at $queryHour");
+            }
 
             // generate result file for top pages based on provided date and hour
             ($this->output)("<info>Generating result for top 25 pages per domain for date $queryDate and hour $queryHour</info>");
@@ -98,6 +105,7 @@ class TopPagesGenerator
                 }
             }
 
+            // Since we'll return the existing results file for this query, we can delete the file we used to create it.
             $this->deletePageViewsFile($pageViewsFilename);
 
             if (!file_exists($this->resultDir)) {
