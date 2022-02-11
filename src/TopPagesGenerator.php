@@ -17,12 +17,21 @@ class TopPagesGenerator
 
     protected mixed $output;
 
+    protected string $resultDir;
+
+    /**
+     * @param DownloadsFiles $downloader
+     * @param $deniedPages
+     * @param $topCount
+     * @param $outputCallback
+     */
     public function __construct(DownloadsFiles $downloader, $deniedPages = [], $topCount = self::TOP_COUNT, $outputCallback = null)
     {
         $this->denied = $deniedPages;
         $this->downloader = $downloader;
         $this->topCount = $topCount;
         $this->output = $outputCallback;
+        $this->resultDir = getenv("TEST") === "1" ? "tests/results/" : "results/";
     }
 
     /**
@@ -41,7 +50,6 @@ class TopPagesGenerator
         $resultFilenames = [];
 
         while ($start->lessThanOrEqualTo($end)) {
-            echo "$start\n";
             $queryDate = $start->toDateString();
             $queryHour = $start->hour;
 
@@ -51,8 +59,8 @@ class TopPagesGenerator
             $resultFilename = $this->generateResultFilename($queryDate, $queryHour);
 
             // Skip this query if we've already generated the results
-            if (file_exists("results/$resultFilename")) {
-                ($this->output)("Result $resultFilename has already been generated\n");
+            if (file_exists($this->resultDir . $resultFilename)) {
+                echo "Result $resultFilename has already been generated\n";
 
                 $resultFilenames[] = $resultFilename;
                 $start->addHour();
@@ -90,25 +98,40 @@ class TopPagesGenerator
                 }
             }
 
-            unlink($pageViewsFilename);
+            $this->deletePageViewsFile($pageViewsFilename);
 
-            if (!file_exists('results')) {
-                mkdir('results', 0777, true);
+            if (!file_exists($this->resultDir)) {
+                mkdir($this->resultDir, 0777, true);
             }
 
             $this->writeQueryResultsToFile($resultFilename, $domains);
 
             $start->addHour();
-            echo "start is now $start\n";
         }
 
         return $resultFilenames;
     }
 
+    /**
+     * Delete the raw downloaded file that's used to generate page views
+     *
+     * @param $filename
+     * @return void
+     */
+    protected function deletePageViewsFile($filename)
+    {
+        unlink($filename);
+    }
+
+    /**
+     * @param $resultFilename
+     * @param $domainResults
+     * @return void
+     */
     protected function writeQueryResultsToFile($resultFilename, $domainResults)
     {
         // write results from query to a results file
-        $resultFileStream = fopen("results/$resultFilename", 'w');
+        $resultFileStream = fopen($this->resultDir . $resultFilename, 'w');
         foreach($domainResults as $domain => $heap) {
             $results = [];
             while ($heap->count() > 0) {
